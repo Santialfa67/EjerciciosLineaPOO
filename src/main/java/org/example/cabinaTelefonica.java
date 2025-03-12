@@ -94,17 +94,5 @@ public class cabinaTelefonica {
         return cabina;
     }
 
-    public int getMinLocales() {
-        return minLocales;
-    }
-
-    public int getMinLargaDistancia() {
-        return minLargaDistancia;
-    }
-
-    public int getMinCelular() {
-        return minCelular;
-    }
-
 
 }
