@@ -7,146 +7,94 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner teclado = new Scanner(System.in);
-        List<Producto> productos = new ArrayList<>();
-        int opcion;
-
+        List<cabinaTelefonica> cabinas = new ArrayList<>();
+        int opcion = 0;
         do {
-            System.out.println("1. Crear producto");
-            if (!productos.isEmpty()) {
-                System.out.println("2. Vender producto");
-                System.out.println("3. Reponer cantidad");
-                System.out.println("4. Aplicar descuento 2%");
-                System.out.println("5. Mostrar productos");
-                System.out.println("6. Aumentar precio 6%");
-                System.out.println("7. Calcular valor total del inventario");
-                System.out.println("8. Eliminar producto por codigo");
+            System.out.println("1. Crear cabina telefonica");
+            if (!cabinas.isEmpty()) { //pregunta si el objeto no esta vacio
+                System.out.println("2. Registrar una llamada");
+                System.out.println("3. Mostrar informacion de una cabina");
+                System.out.println("4. Mostrar consolidado de todas las cabinas");
+                System.out.println("5. Reiniciar una cabina");
             }
-            System.out.println("9. Salir");
+            System.out.println("6. Salir");
             System.out.print("Seleccione una opcion: ");
-
             while (!teclado.hasNextInt()) {
-                System.out.print("Por favor, ingrese un numero valido: ");
+                System.out.print("Numero invalido: ");
                 teclado.next();
             }
             opcion = teclado.nextInt();
             teclado.nextLine();
 
-            if (opcion != 1 && productos.isEmpty() && opcion != 9) {
-                System.out.println("Debe crear al menos un producto antes de usar esta opcion.");
+            if (cabinas.isEmpty() && opcion != 1 && opcion != 6) {
+                System.out.println("Debe crear al menos una cabina antes de usar esta opcion.");
                 continue;
             }
             switch (opcion) {
                 case 1 -> {
-                    System.out.print("Ingrese el codigo del producto: ");
-                    String codigo = teclado.nextLine();
-                    System.out.print("Ingrese el nombre del producto: ");
-                    String nombre = teclado.nextLine();
-
-                    int precio;
-                    do {
-                        System.out.print("Ingrese el precio del producto: ");
-                        while (!teclado.hasNextInt()) {
-                            System.out.print("Ingrese un numero valido para el precio: ");
-                            teclado.next();
-                        }
-                        precio = teclado.nextInt();
-                        if (precio <= 0) System.out.println("El precio debe ser mayor que 0.");
-                    } while (precio <= 0);
-
-                    int cantidad;
-                    do {
-                        System.out.print("Ingrese la cantidad en el inventario: ");
-                        while (!teclado.hasNextInt()) {
-                            System.out.print("Ingrese un numero valido para la cantidad: ");
-                            teclado.next();
-                        }
-                        cantidad = teclado.nextInt();
-                        if (cantidad <= 0) System.out.println("La cantidad debe ser mayor que 0.");
-                    } while (cantidad <= 0);
-
-                    Producto obj = new Producto();
-                    obj.crearProducto(codigo, nombre, precio, cantidad);
-                    productos.add(obj);
-                    System.out.println("Producto agregado.");
+                    int cabina = cabinas.size() + 1; //Trae la cantidad que hay en la lista en enteros
+                    cabinas.add(new cabinaTelefonica(cabina));
+                    System.out.println("ID de Cabina: " + cabina);
                 }
                 case 2 -> {
-                    System.out.print("Ingrese el codigo del producto a vender: ");
-                    String codigoVenta = teclado.nextLine();
-                    Producto productoVenta = buscarProducto(productos, codigoVenta);
-
-                    if (productoVenta != null) {
-                        int cantidadVenta;
-                        do {
-                            System.out.print("Ingrese la cantidad a vender: ");
-                            while (!teclado.hasNextInt()) {
-                                System.out.print("Ingrese un numero valido: ");
-                                teclado.next();
-                            }
-                            cantidadVenta = teclado.nextInt();
-                            if (cantidadVenta <= 0) System.out.println("Debe ingresar una cantidad mayor a 0.");
-                        } while (cantidadVenta <= 0);
-
-                        productoVenta.venderProducto(cantidadVenta);
+                    System.out.print("Ingrese el ID de la cabina: ");
+                    int id = teclado.nextInt();
+                    cabinaTelefonica cabina = cabinaTelefonica.buscarCabinaTelefonica(cabinas, id);
+                    if (cabina != null) {
+                        System.out.println("1. Local");
+                        System.out.println("2. Larga Distancia");
+                        System.out.println("3. Celular");
+                        System.out.print("Seleccione el tipo de llamada: ");
+                        int tipo = teclado.nextInt();
+                        cabina.registarLlamada(tipo);
                     } else {
-                        System.out.println("Producto no encontrado.");
+                        System.out.println("Cabina no encontrada");
                     }
                 }
                 case 3 -> {
-                    System.out.print("Ingrese el codigo del producto a reponer: ");
-                    String codigoReponer = teclado.nextLine();
-                    Producto productoReponer = buscarProducto(productos, codigoReponer);
-
-                    if (productoReponer != null) {
-                        int cantidadReponer;
-                        do {
-                            System.out.print("Ingrese la cantidad a reponer: ");
-                            while (!teclado.hasNextInt()) {
-                                System.out.print("Ingrese un numero valido: ");
-                                teclado.next();
-                            }
-                            cantidadReponer = teclado.nextInt();
-                            if (cantidadReponer <= 0) System.out.println("Debe ingresar una cantidad mayor a 0.");
-                        } while (cantidadReponer <= 0);
-
-                        productoReponer.reponerProducto(cantidadReponer);
+                    System.out.print("Ingrese el ID de la cabina: ");
+                    int id = teclado.nextInt();
+                    cabinaTelefonica cabina = cabinaTelefonica.buscarCabinaTelefonica(cabinas, id);
+                    if (cabina != null) {
+                        cabina.mostrarInformacion();
                     } else {
-                        System.out.println("Producto no encontrado.");
+                        System.out.println("Cabina no encontrada.");
                     }
                 }
-                case 4 -> productos.forEach(Producto::descuento);
-                case 5 ->{
-                        System.out.println("Aun no hay inventario");
+                case 4 -> {
+                    int totalCosto = 0, totalLlamadas = 0, totalMinutos = 0;
+                    int totalMinLocales = 0, totalMinLargaDistancia = 0, totalMinCelular = 0;
 
-                        productos.forEach(Producto::mostrarProducto);
-                }
-                case 6 -> productos.forEach(Producto::aumentarPrecio);
-                case 7 -> {
-                    int totalInventario = 0;
-
-                    for (Producto producto : productos) {
-                        totalInventario += producto.inventario();
+                    for (cabinaTelefonica cabina : cabinas) {
+                        totalCosto += cabina.calcularCostoTotal();
+                        totalLlamadas += cabina.calcularLlamadasTotales();
+                        totalMinutos += cabina.calcularMinutosTotales();
+                        totalMinLocales += cabina.getMinLocales();
+                        totalMinLargaDistancia += cabina.getMinLargaDistancia();
+                        totalMinCelular += cabina.getMinCelular();
                     }
-                    System.out.println("Valor total del inventario: $" + totalInventario);
 
+                    System.out.println("Consolidado de todas las cabinas:");
+                    System.out.println("Total Llamadas: " + totalLlamadas);
+                    System.out.println("Total Minutos: " + totalMinutos);
+                    System.out.println("Minutos Locales: " + totalMinLocales);
+                    System.out.println("Minutos Larga Distancia: " + totalMinLargaDistancia);
+                    System.out.println("Minutos a Celular: " + totalMinCelular);
+                    System.out.println("Costo Total: $" + totalCosto);
                 }
-                case 8 -> {
-                    System.out.print("Codigo del producto a eliminar: ");
-                    String codigoEliminar = teclado.nextLine();
-                    boolean eliminado = productos.removeIf(p -> p.getCodigo().equals(codigoEliminar));
-                    System.out.println(eliminado ? "Producto eliminado." : "Producto no encontrado.");
+                case 5 -> {
+                    System.out.print("Ingrese el ID de la cabina: ");
+                    int id = teclado.nextInt();
+                    cabinaTelefonica cabina = cabinaTelefonica.buscarCabinaTelefonica(cabinas, id);
+                    if (cabina != null) {
+                        cabina.reiniciarCabina();
+                    } else {
+                        System.out.println("Cabina no encontrada.....");
+                    }
                 }
-                case 9 -> System.out.println("Saliendo del sistema...");
+                case 6 -> System.out.println("Saliendo del sistema...");
                 default -> System.out.println("Opcion no valida.");
             }
-        } while (opcion != 9);
-    }
-
-    private static Producto buscarProducto(List<Producto> productos, String codigo) {
-        for (Producto producto : productos) {
-            if (producto.getCodigo().equals(codigo)) {
-                return producto;
-            }
-        }
-        return null;
+        } while (opcion != 6);
     }
 }
